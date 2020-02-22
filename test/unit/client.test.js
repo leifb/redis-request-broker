@@ -2,6 +2,7 @@ const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 const { Client, Worker } = require('../../index');
 const namespace = 'rrb-test-client';
+const redis = require('redis');
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -13,10 +14,21 @@ describe('Client', function () {
             return new Promise((resolve, _) => { setTimeout(() => resolve(work * 2), 5) });
         }, { namespace });
         await this.worker.listen();
+        this.redis = redis.createClient();
     });
 
     this.afterAll(async function () {
         await this.worker.stop();
+        const leftOvers = await new Promise((resolve, _) => {
+            this.redis.keys(`${namespace}:*`, (_, keys) => {
+                resolve(keys);
+            });
+        });
+        for (const k of leftOvers)
+            await this.redis.del(k);
+
+        if (leftOvers.length > 0)
+            throw Error(`${leftOvers.length} leftover keys found: [${leftOvers.join(', ')}]`);
     });
 
     this.slow(40);
@@ -50,10 +62,11 @@ describe('Client', function () {
 
     it('should use the namespace option', async function () {
         this.slow(200);
-        const c = new Client('test', { namespace: 'no worker here', timeout: 70 });
+        const c = new Client('test', { namespace: `${namespace}:no worker here`, timeout: 70 });
         await c.connect();
         await c.request(10).should.be.rejectedWith(Error, 'Request timed out');
         await c.disconnect();
+        await this.redis.del(`${namespace}:no worker here:q:test`);
     });
 
     it('should fail when not connected', async function () {

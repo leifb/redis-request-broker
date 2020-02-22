@@ -1,6 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 const { Client, Worker } = require('../../index');
+const redis = require('redis');
 
 const namespace = 'rrb-test-worker';
 chai.use(chaiAsPromised);
@@ -11,11 +12,21 @@ describe('Worker', function () {
     this.beforeAll(async function () {
         this.client = new Client('test', { namespace });
         await this.client.connect();
+        this.redis = redis.createClient();
     });
 
     this.afterAll(async function () {
         await this.client.disconnect();
-        // TODO clean up
+        const leftOvers = await new Promise((resolve, _) => {
+            this.redis.keys(`${namespace}:*`, (_, keys) => {
+                resolve(keys);
+            });
+        });
+        for (const k of leftOvers)
+            await this.redis.del(k);
+
+        if (leftOvers.length > 0)
+            throw Error(`${leftOvers.length} leftover keys found: [${leftOvers.join(', ')}]`);
     });
 
     this.slow(30);
