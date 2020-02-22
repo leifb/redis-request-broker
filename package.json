@@ -3,6 +3,13 @@
   "version": "1.1.0",
   "author": "Leif Bernsdorf <leif.bernsdorf@gmail.com> (https://github.com/leifb)",
   "description": "A request broker based on the redis PUB / SUB system",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leifb/redis-request-broker"
+  },
+  "bugs": {
+    "url": "https://github.com/leifb/redis-request-broker/issues"
+  },
   "main": "index.js",
   "scripts": {
     "test": "mocha -c test/unit/"
