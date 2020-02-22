@@ -9,47 +9,61 @@ chai.should();
 
 describe('Worker', function () {
 
-    this.beforeAll(async function () {
-        this.client = new Client('test', { namespace });
-        await this.client.connect();
+    // =====
+    // Setup
+    // =====
+
+    before(async function () {
+        this.queueItentity = 'test-identity';
+        this.clientIdentity = new Client(this.queueItentity, { namespace });
+        await this.clientIdentity.connect().should.be.fulfilled;
         this.redis = redis.createClient();
     });
 
-    this.afterAll(async function () {
-        await this.client.disconnect();
+    after(async function () {
+        await this.clientIdentity.disconnect().should.be.fulfilled;
         const leftOvers = await new Promise((resolve, _) => {
             this.redis.keys(`${namespace}:*`, (_, keys) => {
                 resolve(keys);
             });
         });
         for (const k of leftOvers)
-            await this.redis.del(k);
+            this.redis.del(k);
+
+        this.redis.end(true);
 
         if (leftOvers.length > 0)
             throw Error(`${leftOvers.length} leftover keys found: [${leftOvers.join(', ')}]`);
     });
 
+    beforeEach(async function () {
+        this.workerIdentity = new Worker(this.queueItentity, async d => d, { namespace });
+        await this.workerIdentity.listen().should.be.fulfilled;
+    });
+
+    afterEach(async function () {
+        await this.workerIdentity.stop().should.be.fulfilled;
+    })
+
     this.slow(30);
     this.timeout(1100);
 
+    // =================
+    // Actual tests here
+    // =================
+
     it('should handle a request from a client', async function () {
-        const w = new Worker('test', async d => d, { namespace });
-        await w.listen();
-        await this.client.request(10).should.eventually.equal(10);
-        await w.stop();
+        await this.clientIdentity.request(10).should.eventually.equal(10);
     });
 
     it('should handle multiple request in succession', async function () {
-        const w = new Worker('test', async d => d, { namespace });
-        await w.listen();
         await Promise.all([
-            this.client.request(10).should.eventually.equal(10),
-            this.client.request(10).should.eventually.equal(10),
-            this.client.request(10).should.eventually.equal(10),
-            this.client.request(10).should.eventually.equal(10),
-            this.client.request(10).should.eventually.equal(10)
+            this.clientIdentity.request(10).should.eventually.equal(10),
+            this.clientIdentity.request(10).should.eventually.equal(10),
+            this.clientIdentity.request(10).should.eventually.equal(10),
+            this.clientIdentity.request(10).should.eventually.equal(10),
+            this.clientIdentity.request(10).should.eventually.equal(10)
         ]);
-        await w.stop();
     });
 
 });
