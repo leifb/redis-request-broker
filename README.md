@@ -12,7 +12,7 @@ as soon as one becomes available. Workers always handle only one request at a ti
  - Allwow multiple parallel workers and clients
  - Limited scope
  
- ## Example
+## Example
  
  ```js
 const { Worker, Client } = require('redis-request-broker');
