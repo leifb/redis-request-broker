@@ -59,7 +59,7 @@ describe('Client', function () {
         await this.clientInvalidNamespace.disconnect().should.be.fulfilled;
     })
 
-    this.slow(40);
+    this.slow(30);
     this.timeout(1100);
 
     // =================
