@@ -31,6 +31,9 @@ async function start() {
 
     const result = await c.request(42);
     console.log('result', r);
+    
+    await w.stop();
+    await c.disconnect();
 }
 
 start();
