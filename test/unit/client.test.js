@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
-const { Client, Worker } = require('../../index');
+const { Client, Worker, Defaults } = require('../../index');
 const namespace = 'rrb-test-client';
 const redis = require('redis');
 
@@ -14,9 +14,10 @@ describe('Client', function () {
     // =====
 
     before(async function () {
+        Defaults.setDefaults({ namespace, timeout: 500 });
         this.worker = new Worker('test', (work) => {
             return new Promise((resolve, _) => { setTimeout(() => resolve(work * 2), 5) });
-        }, { namespace });
+        });
 
         await this.worker.listen().should.be.fulfilled;
         this.redis = redis.createClient();
@@ -42,10 +43,10 @@ describe('Client', function () {
 
     /** Unique clients for every test */
     beforeEach(async function () {
-        this.clientValid = new Client('test', { namespace });
-        this.clientInvalidQueue = new Client('invalid queue', { namespace, timeout: 70 });
+        this.clientValid = new Client('test');
+        this.clientInvalidQueue = new Client('invalid queue', { timeout: 70 });
         this.clientInvalidNamespace = new Client('test', { namespace: `${namespace}:invalid namespace`, timeout: 70 });
-        this.clientUnconnected = new Client('test', { namespace });
+        this.clientUnconnected = new Client('test');
         await this.clientValid.connect().should.be.fulfilled;
         await this.clientInvalidQueue.connect().should.be.fulfilled;
         await this.clientInvalidNamespace.connect().should.be.fulfilled;
@@ -108,9 +109,9 @@ describe('Client', function () {
             if (worked) throw new Error('Only one worker should handle the request');
             worked = true;
         }
-        const w1 = new Worker(testSpecificQueue, work, { namespace });
-        const w2 = new Worker(testSpecificQueue, work, { namespace });
-        const c = new Client(testSpecificQueue, { namespace });
+        const w1 = new Worker(testSpecificQueue, work);
+        const w2 = new Worker(testSpecificQueue, work);
+        const c = new Client(testSpecificQueue);
         try {
             await w1.listen().should.be.fulfilled;
             await w2.listen().should.be.fulfilled;

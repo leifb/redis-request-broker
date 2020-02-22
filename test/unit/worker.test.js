@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
-const { Client, Worker } = require('../../index');
+const { Client, Worker, Defaults } = require('../../index');
 const redis = require('redis');
 
 const namespace = 'rrb-test-worker';
@@ -14,8 +14,9 @@ describe('Worker', function () {
     // =====
 
     before(async function () {
+        Defaults.setDefaults({ namespace, timeout: 500 });
         this.queueItentity = 'test-identity';
-        this.clientIdentity = new Client(this.queueItentity, { namespace });
+        this.clientIdentity = new Client(this.queueItentity);
         await this.clientIdentity.connect().should.be.fulfilled;
         this.redis = redis.createClient();
     });
@@ -37,7 +38,7 @@ describe('Worker', function () {
     });
 
     beforeEach(async function () {
-        this.workerIdentity = new Worker(this.queueItentity, async d => d, { namespace });
+        this.workerIdentity = new Worker(this.queueItentity, async d => d);
         await this.workerIdentity.listen().should.be.fulfilled;
     });
 
