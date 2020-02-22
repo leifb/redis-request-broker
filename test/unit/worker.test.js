@@ -14,11 +14,11 @@ describe('Worker', function () {
     // =====
 
     before(async function () {
-        Defaults.setDefaults({ namespace, timeout: 500 });
+        Defaults.setDefaults({ redis: { prefix: `${namespace}:` }, timeout: 500 });
         this.queueItentity = 'test-identity';
         this.clientIdentity = new Client(this.queueItentity);
         await this.clientIdentity.connect().should.be.fulfilled;
-        this.redis = redis.createClient();
+        this.redis = redis.createClient(Defaults.apply().redis);
     });
 
     after(async function () {

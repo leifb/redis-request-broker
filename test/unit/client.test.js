@@ -14,13 +14,13 @@ describe('Client', function () {
     // =====
 
     before(async function () {
-        Defaults.setDefaults({ namespace, timeout: 500 });
+        Defaults.setDefaults({ redis: { prefix: `${namespace}:` }, timeout: 500 });
         this.worker = new Worker('test', (work) => {
             return new Promise((resolve, _) => { setTimeout(() => resolve(work * 2), 5) });
         });
 
         await this.worker.listen().should.be.fulfilled;
-        this.redis = redis.createClient();
+        this.redis = redis.createClient(Defaults.apply().redis);
     });
 
     after(async function () {
@@ -45,7 +45,7 @@ describe('Client', function () {
     beforeEach(async function () {
         this.clientValid = new Client('test');
         this.clientInvalidQueue = new Client('invalid queue', { timeout: 70 });
-        this.clientInvalidNamespace = new Client('test', { namespace: `${namespace}:invalid namespace`, timeout: 70 });
+        this.clientInvalidNamespace = new Client('test', { redis: { prefix: `${namespace}:invalid namespace:` }, timeout: 70 });
         this.clientUnconnected = new Client('test');
         await this.clientValid.connect().should.be.fulfilled;
         await this.clientInvalidQueue.connect().should.be.fulfilled;
@@ -76,7 +76,17 @@ describe('Client', function () {
             await this.clientInvalidQueue.request(20).should.be.rejectedWith(Error, 'Request timed out');
         }
         finally {
-            await this.redis.del(`${namespace}:q:invalid queue`);
+            await new Promise((resolve, reject) => {
+                this.redis.del(`q:invalid queue`, (err, del) => {
+                    if (err)
+                        reject(err);
+
+                    if (!del)
+                        reject(new Error('Key not deleted'));
+                    else
+                        resolve()
+                });
+            });
         }
     });
 
@@ -93,7 +103,7 @@ describe('Client', function () {
             await this.clientInvalidNamespace.request(10).should.be.rejectedWith(Error, 'Request timed out');
         }
         finally {
-            await this.redis.del(`${namespace}:invalid namespace:q:test`);
+            await this.redis.del(`invalid namespace:q:test`);
         }
     });
 
