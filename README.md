@@ -39,6 +39,52 @@ async function start() {
 start();
 ```
 
+## Configuration
+
+You can configure each client and worker itself or set process wide defaults:
+
+```js
+const { Worker, Client, Defaults } = require('redis-request-broker');
+Defaults.setDefaults({ redis: { port: 1234, db: 'separated' } });
+const w1 = new Worker('myqueue', someWork, { logger: console.log }); // Options will be merged
+```
+
+Here are all available options:
+
+ - `redis`: An object that configures the redis connection. It will be passed
+   directly to the `createClient` method of the underlying `redis` package. See
+   The [redis](https://www.npmjs.com/package/redis#options-object-properties) npm
+   package for more information.
+   
+   **IMPORTANT:** When overriding you should make sure to set either the `prefix`
+   or the `db` option or otherwise your keys might get mixed up with other stuff
+   in the database!
+    
+     - The default value is `{ prefix: 'rrb:' }`.
+     - Example: `{ port: 1234, db: 'myapp' }`
+     
+ - `timeout`: A timeout in ms after which a request fails. For the client that means
+    when it will stop waiting for a response from a worker and rejects the request.
+    
+     - The default value is `1000` ms.
+     - Example: `{ timeout: 5000 } // five seconds`
+  
+ - `logger`: Allows to inject a custom logger. It has to be a method that takes two
+    arguments: The logging level and a message. The logging levels are strings by
+    default, but you can configure them to be whatever you want by using the levels
+    option.
+  
+     - The default logger is writing `error`, `warning` and `notice` logs to the console.
+     - Example: `{ logger: (level, message) => console.log(message)}`
+  
+ - `levels`: Allows to customize what gets passed into the logger method for logging.
+   The package uses five different levels: error, warning, notice, info and debug.
+    
+    - The default values are the respective strings ('error' for error, etc.) and
+      are therefore compatible with winston log levels.
+    - Example: `{ levels: { error: 'e', warning: 'w', notice: 'n', info: 'i', debug: 'd' }}`
+
+
 ## Inner workings
 
 Here is how it is working:
