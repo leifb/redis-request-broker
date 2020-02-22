@@ -1,5 +1,5 @@
 {
-  "name": "redis-request-borker",
+  "name": "redis-request-broker",
   "version": "1.0.1",
   "author": "Leif Bernsdorf <leif.bernsdorf@gmail.com> (https://github.com/leifb)",
   "description": "A request broker based on the redis PUB / SUB system",
