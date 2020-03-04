@@ -1,4 +1,7 @@
 # redis-request-broker
+
+[![Build Status](https://travis-ci.org/leifb/redis-request-broker.svg?branch=master)](https://travis-ci.org/leifb/redis-request-broker)
+
 A request broker based on the redis PUB / SUB system. This package can be used for the communication of distributed
 systems when one service needs to request data from another.
 
