@@ -85,7 +85,7 @@ Here are all available options:
       are therefore compatible with winston log levels.
     - Example: `{ levels: { error: 'e', warning: 'w', notice: 'n', info: 'i', debug: 'd' }}`
 
-## Transparent errors handling
+## Transparent Error Handling
 
 If the `handle` mehod of the worker rejects the request, the error will be transmitted to the
 client where the `reqeust` call will be rejected with the same error, if not already timed out.
