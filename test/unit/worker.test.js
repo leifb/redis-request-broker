@@ -16,13 +16,17 @@ describe('Worker', function () {
     before(async function () {
         Defaults.setDefaults({ redis: { prefix: `${namespace}:` }, timeout: 500 });
         this.queueItentity = 'test-identity';
+        this.queueThrowing = 'test-throwing';
         this.clientIdentity = new Client(this.queueItentity);
+        this.clientThrowing = new Client(this.queueThrowing);
         await this.clientIdentity.connect().should.be.fulfilled;
+        await this.clientThrowing.connect().should.be.fulfilled;
         this.redis = redis.createClient(Defaults.apply().redis);
     });
 
     after(async function () {
         await this.clientIdentity.disconnect().should.be.fulfilled;
+        await this.clientThrowing.disconnect().should.be.fulfilled;
         const leftOvers = await new Promise((resolve, _) => {
             this.redis.keys(`${namespace}:*`, (_, keys) => {
                 resolve(keys);
@@ -39,11 +43,14 @@ describe('Worker', function () {
 
     beforeEach(async function () {
         this.workerIdentity = new Worker(this.queueItentity, async d => d);
+        this.workerThrowing = new Worker(this.queueThrowing, async d => { throw d });
         await this.workerIdentity.listen().should.be.fulfilled;
+        await this.workerThrowing.listen().should.be.fulfilled;
     });
 
     afterEach(async function () {
         await this.workerIdentity.stop().should.be.fulfilled;
+        await this.workerThrowing.stop().should.be.fulfilled;
     })
 
     this.slow(30);
@@ -65,6 +72,10 @@ describe('Worker', function () {
             this.clientIdentity.request(10).should.eventually.equal(10),
             this.clientIdentity.request(10).should.eventually.equal(10)
         ]);
+    });
+
+    it('should transmit errors transparently', async function () {
+        await this.clientThrowing.request('data').should.be.rejectedWith('data');
     });
 
 });
