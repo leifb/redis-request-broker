@@ -12,7 +12,7 @@ as soon as one becomes available. Workers always handle only one request at a ti
 
  - Simple to use
  - Thread safe 
- - Allwow multiple parallel workers and clients
+ - Allow multiple parallel workers and clients
  - Limited scope
  - Transparent usage
  
