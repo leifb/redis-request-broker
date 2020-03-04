@@ -11,6 +11,7 @@ as soon as one becomes available. Workers always handle only one request at a ti
  - Thread safe 
  - Allwow multiple parallel workers and clients
  - Limited scope
+ - Transparent usage
  
 ## Example
  
@@ -84,6 +85,30 @@ Here are all available options:
       are therefore compatible with winston log levels.
     - Example: `{ levels: { error: 'e', warning: 'w', notice: 'n', info: 'i', debug: 'd' }}`
 
+## Transparent errors handling
+
+If the `handle` mehod of the worker rejects the request, the error will be transmitted to the
+client where the `reqeust` call will be rejected with the same error, if not already timed out.
+
+Here is a simple example of this behavior:
+
+```js
+const w = new Worker('throwing', d => { throw d; });
+const c = new Client('throwing');
+await w.listen();
+await c.connect();
+try {
+  await c.request('My Request');
+}
+catch (error) {
+  console.log(error); // Will log 'My Request'
+}
+```
+
+Note that due to the fact that all data that is sent between workers and clients is serialized,
+some properties of your errors may not be present on the client side, especially methods.
+
+Internally, `JSON.stringify` and `JSON.parse` are used for the (de-) serialization.
 
 ## Inner workings
 
