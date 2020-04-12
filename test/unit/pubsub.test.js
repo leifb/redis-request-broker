@@ -167,7 +167,7 @@ describe('Pub Sub', function () {
     });
 
     it('should handle throwing or rejecting handlers', async function() {
-        const count = await this.publisherThrow.publish('Leif ist doof').should.be.fulfilled;
+        const count = await this.publisherThrow.publish('message').should.be.fulfilled;
         count.should.eq(2);
 
     });
