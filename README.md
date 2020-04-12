@@ -2,11 +2,13 @@
 
 [![Build Status](https://travis-ci.org/leifb/redis-request-broker.svg?branch=master)](https://travis-ci.org/leifb/redis-request-broker)
 
-A request broker based on the redis PUB / SUB system. This package can be used for the communication of distributed
+A request broker and message broker based on the redis PUB / SUB system. This package can be used for the communication of distributed
 systems when one service needs to request data from another.
 
-Requests will be send to only one worker. If no worker is currently idle, the request will be queued and picked up
+Clients will send requests to only one worker. If no worker is currently idle, the request will be queued and picked up
 as soon as one becomes available. Workers always handle only one request at a time.
+
+Publishers send messages to all susbcribers that are currently listening.
 
 ## Goals
 
@@ -17,8 +19,10 @@ as soon as one becomes available. Workers always handle only one request at a ti
  - Transparent usage
  
 ## Example
- 
- ```js
+
+### Client and Worker
+
+```js
 const { Worker, Client } = require('redis-request-broker');
 
 async function doWork(data) {
@@ -43,9 +47,37 @@ async function start() {
 start();
 ```
 
+### Publisher and Subscribers
+
+```js
+const { Publisher, Subscriber } = require('redis-request-broker');
+
+function handle(message) {
+    console.log('Received message', data);
+}
+
+const s1 = new Subscriber('myqueue', handle);
+const s2 = new Subscriber('myqueue', handle);
+const p = new Publisher('myqueue');
+
+async function start() {
+    await s1.listen();
+    await s2.listen();
+    await p.connect();
+
+    await p.publish(42);
+    
+    await s1.stop();
+    await s2.stop();
+    await p.disconnect();
+}
+
+start();
+```
+
 ## Configuration
 
-You can configure each client and worker itself or set process wide defaults:
+You can configure each client, worker, publisher and subscriber itself or set process wide defaults:
 
 ```js
 const { Worker, Client, Defaults } = require('redis-request-broker');
@@ -87,6 +119,13 @@ Here are all available options:
     - The default values are the respective strings ('error' for error, etc.) and
       are therefore compatible with winston log levels.
     - Example: `{ levels: { error: 'e', warning: 'w', notice: 'n', info: 'i', debug: 'd' }}`
+
+ - `minimumRecipients`: Sets the minimum amount of recipients that should receive 
+    a published message. Only effects the publisher.
+  
+    - The default value is `0`.
+    - Example: `{ minimumRecipients: 2 }`
+  
 
 ## Transparent Error Handling
 
