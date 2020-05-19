@@ -11,6 +11,7 @@
     "url": "https://github.com/leifb/redis-request-broker/issues"
   },
   "main": "index.js",
+  "typings": "typings/index.d.ts",
   "scripts": {
     "test": "mocha -c test/unit/"
   },
