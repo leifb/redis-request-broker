@@ -1,4 +1,5 @@
-type Redis = object;
+import { ClientOpts as Redis } from 'redis'
+
 type Timeout = number;
 type Logger = (level: Level) => void;
 type Level = string | any;
