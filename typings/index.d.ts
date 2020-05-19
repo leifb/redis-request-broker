@@ -6,7 +6,7 @@ import Publisher from './lib/publisher';
 import * as Defaults from './lib/defaults';
 
 declare module "redis-request-broker" {
-	export const Wroker;
+	export const Worker;
 	export const Client;
 	export const Subscriber;
 	export const Publisher;
