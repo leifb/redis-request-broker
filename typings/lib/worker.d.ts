@@ -1,4 +1,4 @@
-import { WorkerOptions } from './options.d.ts';
+import { WorkerOptions } from './options'
 
 export default class Worker<Data, Result> {
 

@@ -1,4 +1,4 @@
-import { SubscriberOptions } from './options.d.ts';
+import { SubscriberOptions } from './options'
 
 export default class Subscriber<Data> {
 

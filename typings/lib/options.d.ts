@@ -1,36 +1,35 @@
+type Redis = object;
+type Timeout = number;
+type Logger = (level: Level) => void;
+type Level = string | any;
+type Levels = { error: Level, warning: Level, notice: Level, info: Level, debug: Level };
+type MinimumRecipients = number;
 
-declare type Redis = object;
-declare type Timeout = number;
-declare type Logger = (level: Level) => void;
-declare type Level = string | any;
-declare type Levels = { error: Level, warning: Level, notice: Level, info: Level, debug: Level };
-declare type MinimumRecipients = number;
-
-declare type ClientOptions = {
+export type ClientOptions = {
     redis?: Redis;
     timeout?: Timeout;
     logger?: Logger;
     levels?: Levels;
 }
 
-declare type WorkerOptions = {
+export type WorkerOptions = {
     redis?: Redis;
     logger?: Logger;
     levels?: Levels;
 }
 
-declare type SubscriberOptions = {
+export type SubscriberOptions = {
     redis?: Redis;
     logger?: Logger;
     levels?: Levels;
 }
 
 
-declare type PublisherOptions = {
+export type PublisherOptions = {
     redis?: Redis;
     logger?: Logger;
     levels?: Levels;
     minimumRecipients?: MinimumRecipients;
 }
 
-declare type Options = ClientOptions & WorkerOptions & SubscriberOptions & PublisherOptions;
+export type Options = ClientOptions & WorkerOptions & SubscriberOptions & PublisherOptions;

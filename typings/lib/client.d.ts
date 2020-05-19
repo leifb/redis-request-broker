@@ -1,4 +1,4 @@
-import { ClientOptions } from './options.d.ts';
+import { ClientOptions } from './options'
 
 export default class Client<Data, Result> {
 

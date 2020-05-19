@@ -1,4 +1,4 @@
-import { PublisherOptions } from './options.d.ts';
+import { PublisherOptions } from './options'
 
 export default class Publisher<Data> {
 
