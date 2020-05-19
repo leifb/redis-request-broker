@@ -137,11 +137,11 @@ describe('Pub Sub', function () {
     });
 
     it('should not be possible to connect a publsiher twice', async function () {
-        await this.publisherOne.connect().should.be.rejectedWith('Publisher already connected');
+        await this.publisherOne.connect().should.be.rejectedWith(Error, 'Publisher already connected');
     });
 
     it('should not be possible to start a subscriber twice', async function () {
-        await this.subscriberOne.listen().should.be.rejectedWith('Subscriber already listening');
+        await this.subscriberOne.listen().should.be.rejectedWith(Error, 'Subscriber already listening');
     });
 
     it('should be possible to disconnect a publisher before connecting', async function () {

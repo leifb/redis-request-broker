@@ -19,6 +19,7 @@
   "dependencies": {
     "@types/redis": "^2.8.21",
     "redis": "^3.0.2",
+    "serialize-error": "^7.0.1",
     "uniqid": "^5.2.0"
   },
   "devDependencies": {
