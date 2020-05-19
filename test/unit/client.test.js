@@ -107,11 +107,6 @@ describe('Client', function () {
         }
     });
 
-    it('should fail when not connected', async function () {
-        await this.clientUnconnected.request(10).should.be.rejectedWith(Error, 'Client not connected');
-        await this.clientUnconnected.disconnect().should.be.rejectedWith(Error, 'Client not connected');
-    });
-
     it('should send the request to only one worker', async function () {
         let worked = false;
         testSpecificQueue = 'test-2';
@@ -133,5 +128,9 @@ describe('Client', function () {
             await w2.stop().should.be.fulfilled;
             await c.disconnect().should.be.fulfilled;
         }
+    });
+
+    it('should be possible to stop when not running', async function () {
+        await this.clientValid.disconnect().should.be.fulfilled;
     });
 });

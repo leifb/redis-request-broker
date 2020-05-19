@@ -52,7 +52,7 @@ describe('Pub Sub', function () {
         this.publisherThree2 = new Publisher(this.channelThree);
         this.publisherToLittle = new Publisher(this.channelOne, { minimumRecipients: 2 });
         this.publisherDisconnected = new Publisher(this.channelOne);
-        this.publisherThrow = new Publisher(this.channelThrow, { minimumRecipients: 2});
+        this.publisherThrow = new Publisher(this.channelThrow, { minimumRecipients: 2 });
 
         this.subscriberOne = new Subscriber(this.channelOne, handleOne);
         this.subscriberThree1 = new Subscriber(this.channelThree, handleThree);
@@ -61,14 +61,14 @@ describe('Pub Sub', function () {
         this.subscriberNotRunning = new Subscriber(this.channelOne, handleOne);
         this.subscriberThrowing = new Subscriber(this.channelThrow, m => { throw m; });
         this.subscriberRejecting = new Subscriber(this.channelThrow, async m => { throw m });
-        
+
         await this.publisherZero.connect().should.be.fulfilled;
         await this.publisherOne.connect().should.be.fulfilled;
         await this.publisherThree.connect().should.be.fulfilled;
         await this.publisherThree2.connect().should.be.fulfilled;
         await this.publisherToLittle.connect().should.be.fulfilled;
         await this.publisherThrow.connect().should.be.fulfilled;
-        
+
         await this.subscriberOne.listen().should.be.fulfilled;
         await this.subscriberThree1.listen().should.be.fulfilled;
         await this.subscriberThree2.listen().should.be.fulfilled;
@@ -114,14 +114,14 @@ describe('Pub Sub', function () {
         count.should.eq(0);
     });
 
-    it('should work with three subscribers', async function() {
+    it('should work with three subscribers', async function () {
         const count = await this.publisherThree.publish('message').should.be.fulfilled;
         count.should.eq(3);
         await sleep(5);
         this.receivedThree.should.deep.eq(['message', 'message', 'message']);
     });
 
-    it('should be possible to have multiple publishers on the same channel', async function() {
+    it('should be possible to have multiple publishers on the same channel', async function () {
         const count1 = await this.publisherThree.publish('message 1').should.be.fulfilled;
         const count2 = await this.publisherThree2.publish('message 2').should.be.fulfilled;
         count1.should.eq(3);
@@ -136,37 +136,37 @@ describe('Pub Sub', function () {
         await this.publisherToLittle.publish('message').should.be.rejected;
     });
 
-    it('should not be possible to connect a publsiher twice', async function() {
+    it('should not be possible to connect a publsiher twice', async function () {
         await this.publisherOne.connect().should.be.rejectedWith('Publisher already connected');
     });
 
-    it('should not be possible to start a subscriber twice', async function() {
+    it('should not be possible to start a subscriber twice', async function () {
         await this.subscriberOne.listen().should.be.rejectedWith('Subscriber already listening');
     });
 
-    it('should not be possible to disconnect a publisher before connecting', async function() {
-        await this.publisherDisconnected.disconnect().should.be.rejectedWith('Publisher not connected');
+    it('should be possible to disconnect a publisher before connecting', async function () {
+        await this.publisherDisconnected.disconnect().should.be.fulfilled;
     });
 
-    it('should not be possible to stop a subscriber before starting', async function() {
-        await this.subscriberNotRunning.stop().should.be.rejectedWith('Subscriber not listening');
+    it('should be possible to stop a subscriber before starting', async function () {
+        await this.subscriberNotRunning.stop().should.be.fulfilled;
     });
 
-    it('should not be possible to disconnect a publisher twice', async function() {
+    it('should be possible to disconnect a publisher twice', async function () {
         const publisher = new Publisher('test-disconnect');
         await publisher.connect().should.be.fulfilled;
         await publisher.disconnect().should.be.fulfilled;
-        await publisher.disconnect().should.be.rejectedWith('Publisher not connected');
+        await publisher.disconnect().should.be.fulfilled;
     });
 
-    it('should not be possible to stop a subscriber twice', async function() {
-        const subscriber = new Subscriber('test-disconnect', m => {});
+    it('should be possible to stop a subscriber twice', async function () {
+        const subscriber = new Subscriber('test-disconnect', m => { });
         await subscriber.listen().should.be.fulfilled;
         await subscriber.stop().should.be.fulfilled;
-        await subscriber.stop().should.be.rejectedWith('Subscriber not listening');
+        await subscriber.stop().should.be.fulfilled;
     });
 
-    it('should handle throwing or rejecting handlers', async function() {
+    it('should handle throwing or rejecting handlers', async function () {
         const count = await this.publisherThrow.publish('message').should.be.fulfilled;
         count.should.eq(2);
 

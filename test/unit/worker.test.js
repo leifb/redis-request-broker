@@ -38,7 +38,7 @@ describe('Worker', function () {
         this.redis.end(true);
 
         if (leftOvers.length > 0)
-            throw Error(`${leftOvers.length} leftover keys found: [${leftOvers.join(', ')}]`);
+            throw Error(`${leftOvers.length} leftover keys found: [${leftOvers.join(', ')}]. Try to run the tests again.`);
     });
 
     beforeEach(async function () {
@@ -76,6 +76,10 @@ describe('Worker', function () {
 
     it('should transmit errors transparently', async function () {
         await this.clientThrowing.request('data').should.be.rejectedWith('data');
+    });
+
+    it('should be possible to stop when not running', async function () {
+        await this.workerIdentity.stop().should.be.fulfilled;
     });
 
 });
