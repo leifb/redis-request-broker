@@ -70,10 +70,10 @@ describe('Client', function () {
         await this.clientValid.request(10).should.eventually.equal(20);
     });
 
-    it('should time out when no worker is available', async function () {
+    it('should realize that no worker is available', async function () {
         this.slow(200);
         try {
-            await this.clientInvalidQueue.request(20).should.be.rejectedWith(Error, 'Request timed out');
+            await this.clientInvalidQueue.request(20).should.be.rejectedWith(Error, 'There is no active worker');
         }
         finally {
             await new Promise((resolve, reject) => {
