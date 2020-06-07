@@ -105,10 +105,16 @@ Here are all available options:
      - The default value is `1000` ms.
      - Example: `{ timeout: 5000 } // five seconds`
   
- - `logger`: Allows to inject a custom logger. It has to be a method that takes two
-    arguments: The logging level and a message. The logging levels are strings by
-    default, but you can configure them to be whatever you want by using the levels
-    option.
+ - `logger`: Allows to inject a custom logger. It has to be a method and is provided with the following arguments:
+ 
+     - level: The level of the log, as configures using `levels`. String by default.
+     - message: The message of the log.
+     - time: The time of the log, as a js Date object.
+     - component: The component that issued the log. Can be `client`, `worker`, `publisher` or `subscriber`.
+     - instance: A string id of the instace that issued the log.
+     - scope: The current operation that the insance was working on when the log has been issued. Are strings like `connect` or `request`
+    
+    It is not necessary to use all of the arguments.
   
      - The default logger is writing `error`, `warning` and `notice` logs to the console.
      - Example: `{ logger: (level, message) => console.log(message)}`
