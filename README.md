@@ -109,7 +109,6 @@ Here are all available options:
  
      - level: The level of the log, as configures using `levels`. String by default.
      - message: The message of the log.
-     - time: The time of the log, as a js Date object.
      - component: The component that issued the log. Can be `client`, `worker`, `publisher` or `subscriber`.
      - instance: A string id of the instace that issued the log.
      - scope: The current operation that the insance was working on when the log has been issued. Are strings like `connect` or `request`
