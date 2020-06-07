@@ -32,7 +32,7 @@ describe('Client', function () {
             });
         });
         for (const k of leftOvers)
-            await this.redis.del(k);
+            await this.redis.del(k.replace(`${namespace}:`, ''));
 
 
         this.redis.end(false);
@@ -44,8 +44,8 @@ describe('Client', function () {
     /** Unique clients for every test */
     beforeEach(async function () {
         this.clientValid = new Client('test');
-        this.clientInvalidQueue = new Client('invalid queue', { timeout: 70 });
-        this.clientInvalidNamespace = new Client('test', { redis: { prefix: `${namespace}:invalid namespace:` }, timeout: 70 });
+        this.clientInvalidQueue = new Client('invalid-queue', { timeout: 70 });
+        this.clientInvalidNamespace = new Client('test', { redis: { prefix: `${namespace}:invalid-namespace:` }, timeout: 70 });
         this.clientUnconnected = new Client('test');
         await this.clientValid.connect().should.be.fulfilled;
         await this.clientInvalidQueue.connect().should.be.fulfilled;
@@ -77,14 +77,10 @@ describe('Client', function () {
         }
         finally {
             await new Promise((resolve, reject) => {
-                this.redis.del(`q:invalid queue`, (err, del) => {
-                    if (err)
-                        reject(err);
-
-                    if (!del)
-                        reject(new Error('Key not deleted'));
-                    else
-                        resolve()
+                this.redis.del(`q:invalid-queue`, (err, del) => {
+                    if (err) reject(err);
+                    if (!del) reject(new Error('Key not deleted'));
+                    else resolve()
                 });
             });
         }
@@ -100,10 +96,16 @@ describe('Client', function () {
 
     it('should use the namespace option', async function () {
         try {
-            await this.clientInvalidNamespace.request(10).should.be.rejectedWith(Error, 'Request timed out');
+            await this.clientInvalidNamespace.request(10).should.be.rejectedWith(Error, 'There is no active worker');
         }
         finally {
-            await this.redis.del(`invalid namespace:q:test`);
+            await new Promise((resolve, reject) => {
+                this.redis.del(`invalid-namespace:q:test`, (err, del) => {
+                    if (err) reject(err);
+                    if (!del) reject(new Error('Key not deleted'));
+                    else resolve()
+                });
+            });
         }
     });
 
