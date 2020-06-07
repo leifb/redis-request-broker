@@ -17,8 +17,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@types/redis": "^2.8.21",
-    "handy-redis": "^1.8.1",
+    "@types/redis": "^2.8.22",
+    "handy-redis": "^1.8.3",
     "redis": "^3.0.2",
     "serialize-error": "^7.0.1",
     "uniqid": "^5.2.0"
@@ -26,6 +26,6 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "mocha": "^7.1.1"
+    "mocha": "^7.2.0"
   }
 }
