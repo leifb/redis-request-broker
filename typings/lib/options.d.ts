@@ -1,10 +1,11 @@
 import { ClientOpts as Redis } from 'redis'
 
 type Timeout = number;
-type Logger = (level: Level) => void;
+type Logger = (level: Level, message: string, time: Date, component: Component, instance: string, scope: strnig) => void;
 type Level = string | any;
 type Levels = { error: Level, warning: Level, notice: Level, info: Level, debug: Level };
 type MinimumRecipients = number;
+type Component = 'worker' | 'client' | 'subscriber' | 'publisher';
 
 export type ClientOptions = {
     redis?: Redis;
