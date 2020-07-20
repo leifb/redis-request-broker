@@ -10,6 +10,28 @@ as soon as one becomes available. Workers always handle only one request at a ti
 
 Publishers send messages to all susbcribers that are currently listening.
 
+## 🚧 New Major version 🚧
+
+From using the redis request broker in a few projects for some time I have learned what works good and what doesn't. With a new major version I want to address a few problems and make big improvements in how this library is beeing used. Most noticably I want to do the following changes:
+
+ -  Streamline the creation and lifecycles of workers, clients, publishers and subscribers
+ 
+    Currently, you need at least three lines of code to manage each of them: Creating, starting and stopping. I want to streamline this process and reduce the nedded lines of code to one, possibly also allow some sort of mass-creation. I envision that creating a client is the same as defining a method, only that instead of implementing the method you specify, where it can be found.
+    
+    As you usually want the connection to be working for the whole lifecycle of your application, starting and stopping can be done automatically or in bulk.
+
+  - Faster serialization and binary data
+  
+    Currently, the messages are serialized using the native `JSON.stringify` and `JSON.parse` methods. This was quite easy to do and works just fine. For the next version, I want to put more thought into this process. The serialization / deserialization should be customizable and a fast method should be provided by default.
+    
+  - Moving to `ioredis`
+  
+    Currently, the `redis` package is used. `ioredis` offers some advantages like native promises and support for binary data. Development seems to be more active as well.
+
+  - Re-using redis clients
+  
+    Currently at least one redis client is used for every client, worker, publisher or subscriber. This is not a problem when you only use a few of thoes, but may cause issues for larger projects.
+
 ## Goals
 
  - Simple to use
