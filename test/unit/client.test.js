@@ -70,43 +70,12 @@ describe('Client', function () {
         await this.clientValid.request(10).should.eventually.equal(20);
     });
 
-    it('should realize that no worker is available', async function () {
-        this.slow(200);
-        try {
-            await this.clientInvalidQueue.request(20).should.be.rejectedWith(Error, 'There is no active worker');
-        }
-        finally {
-            await new Promise((resolve, reject) => {
-                this.redis.del(`q:invalid-queue`, (err, del) => {
-                    if (err) reject(err);
-                    if (!del) reject(new Error('Key not deleted'));
-                    else resolve()
-                });
-            });
-        }
-    });
-
     it('should use the request queue', async function () {
         this.slow(50);
         await Promise.all([
             this.clientValid.request(10).should.eventually.equal(20),
             this.clientValid.request(20).should.eventually.equal(40)
         ]);
-    });
-
-    it('should use the namespace option', async function () {
-        try {
-            await this.clientInvalidNamespace.request(10).should.be.rejectedWith(Error, 'There is no active worker');
-        }
-        finally {
-            await new Promise((resolve, reject) => {
-                this.redis.del(`invalid-namespace:q:test`, (err, del) => {
-                    if (err) reject(err);
-                    if (!del) reject(new Error('Key not deleted'));
-                    else resolve()
-                });
-            });
-        }
     });
 
     it('should send the request to only one worker', async function () {
